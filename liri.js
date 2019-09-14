@@ -1,8 +1,9 @@
 
-//require("dotenv").config();
-//var keys = require("./keys.js");
-//var spotify = new Spotify(keys.spotify);
+require("dotenv").config();
+var keys = require("./keys.js");
+//var http=require("http");
 var axios = require("axios");
+var Spotify = require("node-spotify-api"); 
 
 //liriCommand = process.argv[2]
 liriParam = process.argv.slice(3).join("+");
@@ -49,9 +50,25 @@ LiriSearch.prototype._axiosSearch = function (url) {
         });
 }
 
-LiriSearch.prototype._spotifySearch = function () {
-    //run spotify search now
-}
+ LiriSearch.prototype._spotifySearch = function (id,secret) {
+     //run spotify search
+
+        this.id = id,
+        this.secret = secret
+
+    return spotify
+        .search({ 
+            type: 'track', 
+            query: this.liriParam, 
+            limit: 1
+          })
+        .then(function(response) {
+          console.log(response.tracks.items[0]);
+        })
+        .catch(function(err) {
+          console.log(err);
+        });
+ }
 
 LiriSearch.prototype.concertResults = function (promise) {
     return promise.then(
@@ -82,10 +99,6 @@ LiriSearch.prototype.movieResults = function (promise) {
         });
 }
 
-LiriSearch.prototype.spotifyResults = function () { }
-//process spotify results
-
-
 LiriSearch.prototype.searchEvent = function (str) {
     if (this.searchType === "concert-this") {
         url = `https://rest.bandsintown.com/artists/${str}/events?app_id=codingbootcamp`;
@@ -100,7 +113,6 @@ LiriSearch.prototype.searchEvent = function (str) {
         return this.spotifyResults(this._spotifySearch);
     }
 }
-
 
 let liriSearch = new LiriSearch(process.argv[2]);
 liriSearch.searchEvent(liriParam).then(function (result) {
