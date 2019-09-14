@@ -1,27 +1,40 @@
 
 require("dotenv").config();
 var keys = require("./keys.js");
-//var http=require("http");
-var axios = require("axios");
-var Spotify = require("node-spotify-api"); 
 
-//liriCommand = process.argv[2]
-liriParam = process.argv.slice(3).join("+");
 
-const LiriSearch = function (searchType) {
-    this.searchType = searchType;
+var liriType = process.argv[2]
+var liriParam = process.argv.slice(3).join("+");
+
+// const LiriSearch = function () {
+//     this.searchType = liriType;
+//     this.searchParam = liriParam;
+//}
+
+const Axios = function(axios=require("axios"),searchParam=liriParam){
+    this.axios = axios //require("axios");
+    this.searchParam = searchParam //liriParam
+    console.log("axios")
+    //this.key = key
 }
 
-LiriSearch.prototype._axiosSearch = function (url) {
+const Spotify = function(id,secret){
+    LiriSearch.call(this,searchParam)
+    this.spotify = require("node-spotify-api");
+    this.id = id;
+    this.secret = secret;
+}; 
+
+Axios.prototype.search = function (url) {
     this.url = url;
     console.log("preAxios");
     console.log(this.url)
-    return axios
+    return this.axios
         .get(this.url)
         .then(function (response) {
             // If the axios was successful...
             // Then log the body from the site!
-            console.log("post Axios"); //, response.data
+            //console.log("response"); //, response.data
             return response.data;
         })
         .catch(function (error) {
@@ -50,12 +63,9 @@ LiriSearch.prototype._axiosSearch = function (url) {
         });
 }
 
- LiriSearch.prototype._spotifySearch = function (id,secret) {
+ Spotify.prototype.search = function () {
      //run spotify search
-
-        this.id = id,
-        this.secret = secret
-
+    console.log(this.id)
     return spotify
         .search({ 
             type: 'track', 
@@ -70,20 +80,20 @@ LiriSearch.prototype._axiosSearch = function (url) {
         });
  }
 
-LiriSearch.prototype.concertResults = function (promise) {
+Axios.prototype.concertResults = function (promise) {
     return promise.then(
         function (str) {
             let list = ""
             for (i = 0; i < str.length; i++) {
                 list += `${str[i].venue.name}  --  ${str[i].venue.city}  ${str[i].venue.region}, ${str[i].venue.country}\n`;
             }
-            return list
+            console.log(list);
+            return list;
         }
     )
 }
 
-
-LiriSearch.prototype.movieResults = function (promise) {
+Axios.prototype.movieResults = function (promise) {
     //process axios search on omdb
     return promise.then(
         function (str) {
@@ -95,39 +105,37 @@ LiriSearch.prototype.movieResults = function (promise) {
            Language: ${str.Language}\n
            Plot: ${str.Plot}
            `
-            );
-        });
+        );
+    });
 }
 
-LiriSearch.prototype.searchEvent = function (str) {
-    if (this.searchType === "concert-this") {
-        url = `https://rest.bandsintown.com/artists/${str}/events?app_id=codingbootcamp`;
-        return this.concertResults(this._axiosSearch(url));
-    }
-    if (this.searchType === "movie-this") {
-        url = `http://www.omdbapi.com/?apikey=d373dcb1&t=${str}`;
-        return this.movieResults(this._axiosSearch(url));
-    }
-    if (this.searchType === "spotify-this") {
-        url = ""
-        return this.spotifyResults(this._spotifySearch);
-    }
+// SearchEvent = function (str) {
+//     if (this.searchType === "concert-this") {
+//         url = `https://rest.bandsintown.com/artists/${str}/events?app_id=codingbootcamp`;
+//         return this.concertResults(this._axiosSearch(url));
+//     }
+//     if (this.searchType === "movie-this") {
+//         url = `http://www.omdbapi.com/?apikey=d373dcb1&t=${str}`;
+//         return this.movieResults(this._axiosSearch(url));
+//     }
+//     if (this.searchType === "spotify-this") {
+//         url = ""
+//         return this.spotifyResults(this._spotifySearch);
+//     }
+//}
+
+const ConcertSearch = function(axios,searchParam){
+    Axios.call(this,axios,searchParam)
+    this.url = `https://rest.bandsintown.com/artists/${this.searchParam}/events?app_id=codingbootcamp`;
 }
+ConcertSearch.prototype = Object.create(Axios.prototype)
+ConcertSearch.prototype.results =  function(){return this.concertResults(this.search(this.url))};
 
-let liriSearch = new LiriSearch(process.argv[2]);
-liriSearch.searchEvent(liriParam).then(function (result) {
-    console.log(result)
-})
-
-
+let concerts = new ConcertSearch()
+concerts.results()
 
 //`https://rest.bandsintown.com/artists/${liriParam}/events?app_id=codingbootcamp`;
-
 //(`http://www.omdbapi.com/?apikey=d373dcb1&s=${liriParam}`
-
-
-
-
 
 
 
