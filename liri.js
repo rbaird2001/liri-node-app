@@ -1,9 +1,9 @@
 
 require("dotenv").config();
-var keys = require("./keys.js");
-
-
-var liriType = process.argv[2]
+let keys = require("./keys.js");
+const Axios = function(){this.axios = require("axios")};
+const Spotify = require("node-spotify-api");
+var liriType = process.argv[2];
 var liriParam = process.argv.slice(3).join("+");
 
 // const LiriSearch = function () {
@@ -11,25 +11,19 @@ var liriParam = process.argv.slice(3).join("+");
 //     this.searchParam = liriParam;
 //}
 
-const Axios = function(axios=require("axios"),searchParam=liriParam){
-    this.axios = axios //require("axios");
-    this.searchParam = searchParam //liriParam
-    console.log("axios")
-    //this.key = key
-}
 
-const Spotify = function(id,secret){
+ Spotify = function(id,secret){
     LiriSearch.call(this,searchParam)
     this.spotify = require("node-spotify-api");
     this.id = id;
     this.secret = secret;
 }; 
 
-Axios.prototype.search = function (url) {
+Axios.prototype.search = function (axios,url) {
     this.url = url;
     console.log("preAxios");
     console.log(this.url)
-    return this.axios
+    return axios
         .get(this.url)
         .then(function (response) {
             // If the axios was successful...
@@ -126,7 +120,7 @@ Axios.prototype.movieResults = function (promise) {
 
 const ConcertSearch = function(axios,searchParam){
     Axios.call(this,axios,searchParam)
-    this.url = `https://rest.bandsintown.com/artists/${this.searchParam}/events?app_id=codingbootcamp`;
+    this.url = `https://rest.bandsintown.com/artists/${liriParam}/events?app_id=codingbootcamp`;
 }
 ConcertSearch.prototype = Object.create(Axios.prototype)
 ConcertSearch.prototype.results =  function(){return this.concertResults(this.search(this.url))};
