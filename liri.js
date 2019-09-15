@@ -2,11 +2,7 @@
 require("dotenv").config();
 let keys = require("./keys.js");
 const Axios = function(){this.axios = require("axios")};
-const Spotify = function(){
-    this.spotify = require("node-spotify-api");
-    this.id = keys.id;
-    this.secret = keys.secret;
-    }
+const Spotify = require("node-spotify-api");
 
 var liriType = process.argv[2];
 var liriParam = process.argv.slice(3).join("+");
@@ -49,25 +45,6 @@ Axios.prototype.search = function (url) {
         });
 }
 
-//add search method to Spotify constructor
- Spotify.prototype.search = function (songTitle) {
-     //run spotify search
-    console.log(this.id)
-    return this.spotify
-        .search({ 
-            type: 'track', 
-            query:  songTitle, 
-            limit: 1
-          })
-        .then(function(response) {
-          console.log(response.tracks.items[0]);
-        })
-        .catch(function(err) {
-          console.log(err);
-        });
- }
-
- //Add concert processing method to Axios constructor
 Axios.prototype.concertResults = function (promise) {
     return promise.then(
         function (str) {
@@ -98,7 +75,52 @@ Axios.prototype.movieResults = function (promise) {
     });
 }
 
-//create new functions from constructors based on the liri search type requested.
+var spotify = new Spotify({
+    id: keys.spotify.id,
+    secret: keys.spotify.secret
+  });
+
+  spotifySearch = function(str){
+    spotify
+      .search({ type: 'track', query: str, limit: 1})
+      .then(function(response) {
+        let ret = response.tracks.items[0];
+        //console.log(ret)
+        let list = 
+        `
+        Song: ${ret.name} 
+           Artist(s): ${ret.artists[0].name}
+           Album: ${ret.album.name}
+           Preview: ${ret.preview_url}
+        `
+        console.log(list);
+      })
+      .catch(function(err) {
+        console.log(err);
+      });
+    }
+//add search method to Spotify constructor
+//  Spotify.prototype.search = function (songTitle) {
+//     this.songTitle = songTitle 
+//     //run spotify search
+//     console.log(this.id)
+//     return spotify
+//         .search({ 
+//             type: 'track', 
+//             query:  this.songTitlesongTitle, 
+//             limit: 1
+//           })
+//         .then(function(response) {
+//           console.log(response.tracks.items[0]);
+//         })
+//         .catch(function(err) {
+//           console.log(err);
+//         })
+//  }
+
+ //Add concert processing method to Axios constructor
+
+//create/call new functions based on the liri search type requested.
 if(liriType === "concert-this"){
     let concertSearch = new Axios
     concertSearch.url = `https://rest.bandsintown.com/artists/${liriParam}/events?app_id=codingbootcamp`;
@@ -110,6 +132,5 @@ if(liriType === "movie-this"){
     return movieSearch.movieResults(movieSearch.search(movieSearch.url));
 }
 if(liriType === "spotify-this-song"){
-    let spotifySearch = new Spotify;
-    return spotifySearch.search(liriParam);
+    console.log(spotifySearch(liriParam))
 }
