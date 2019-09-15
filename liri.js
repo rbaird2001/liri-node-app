@@ -2,33 +2,25 @@
 require("dotenv").config();
 let keys = require("./keys.js");
 const Axios = function(){this.axios = require("axios")};
-const Spotify = require("node-spotify-api");
+const Spotify = function(){
+    this.spotify = require("node-spotify-api");
+    this.id = keys.id;
+    this.secret = keys.secret;
+    }
+
 var liriType = process.argv[2];
 var liriParam = process.argv.slice(3).join("+");
-
-// const LiriSearch = function () {
-//     this.searchType = liriType;
-//     this.searchParam = liriParam;
-//}
-
-
- Spotify = function(id,secret){
-    LiriSearch.call(this,searchParam)
-    this.spotify = require("node-spotify-api");
-    this.id = id;
-    this.secret = secret;
-}; 
-
-Axios.prototype.search = function (axios,url) {
+ 
+//Add search method to Axios constructor 
+Axios.prototype.search = function (url) {
     this.url = url;
     console.log("preAxios");
-    console.log(this.url)
-    return axios
+    console.log(this.url);
+    return this.axios
         .get(this.url)
         .then(function (response) {
             // If the axios was successful...
             // Then log the body from the site!
-            //console.log("response"); //, response.data
             return response.data;
         })
         .catch(function (error) {
@@ -57,13 +49,14 @@ Axios.prototype.search = function (axios,url) {
         });
 }
 
- Spotify.prototype.search = function () {
+//add search method to Spotify constructor
+ Spotify.prototype.search = function (songTitle) {
      //run spotify search
     console.log(this.id)
-    return spotify
+    return this.spotify
         .search({ 
             type: 'track', 
-            query: this.liriParam, 
+            query:  songTitle, 
             limit: 1
           })
         .then(function(response) {
@@ -74,6 +67,7 @@ Axios.prototype.search = function (axios,url) {
         });
  }
 
+ //Add concert processing method to Axios constructor
 Axios.prototype.concertResults = function (promise) {
     return promise.then(
         function (str) {
@@ -82,11 +76,12 @@ Axios.prototype.concertResults = function (promise) {
                 list += `${str[i].venue.name}  --  ${str[i].venue.city}  ${str[i].venue.region}, ${str[i].venue.country}\n`;
             }
             console.log(list);
-            return list;
+            return true;
         }
     )
 }
 
+//add movie processing method to Axios constructor
 Axios.prototype.movieResults = function (promise) {
     //process axios search on omdb
     return promise.then(
@@ -103,33 +98,18 @@ Axios.prototype.movieResults = function (promise) {
     });
 }
 
-// SearchEvent = function (str) {
-//     if (this.searchType === "concert-this") {
-//         url = `https://rest.bandsintown.com/artists/${str}/events?app_id=codingbootcamp`;
-//         return this.concertResults(this._axiosSearch(url));
-//     }
-//     if (this.searchType === "movie-this") {
-//         url = `http://www.omdbapi.com/?apikey=d373dcb1&t=${str}`;
-//         return this.movieResults(this._axiosSearch(url));
-//     }
-//     if (this.searchType === "spotify-this") {
-//         url = ""
-//         return this.spotifyResults(this._spotifySearch);
-//     }
-//}
-
-const ConcertSearch = function(axios,searchParam){
-    Axios.call(this,axios,searchParam)
-    this.url = `https://rest.bandsintown.com/artists/${liriParam}/events?app_id=codingbootcamp`;
+//create new functions from constructors based on the liri search type requested.
+if(liriType === "concert-this"){
+    let concertSearch = new Axios
+    concertSearch.url = `https://rest.bandsintown.com/artists/${liriParam}/events?app_id=codingbootcamp`;
+    return concertSearch.concertResults(concertSearch.search(concertSearch.url));
 }
-ConcertSearch.prototype = Object.create(Axios.prototype)
-ConcertSearch.prototype.results =  function(){return this.concertResults(this.search(this.url))};
-
-let concerts = new ConcertSearch()
-concerts.results()
-
-//`https://rest.bandsintown.com/artists/${liriParam}/events?app_id=codingbootcamp`;
-//(`http://www.omdbapi.com/?apikey=d373dcb1&s=${liriParam}`
-
-
-
+if(liriType === "movie-this"){
+    let movieSearch = new Axios
+    movieSearch.url = `http://www.omdbapi.com/?apikey=d373dcb1&t=${liriParam}`;
+    return movieSearch.movieResults(movieSearch.search(movieSearch.url));
+}
+if(liriType === "spotify-this-song"){
+    let spotifySearch = new Spotify;
+    return spotifySearch.search(liriParam);
+}
