@@ -36,8 +36,8 @@ Node Modules:
 Project is a solo project.
 
 ## Acknowledgements
-Richard Baird
-Andi Carlstrom
-Katie Sexton
-Jaron Landeen
-Irv Irra
+* Richard Baird
+* Andi Carlstrom
+* Katie Sexton
+* Jaron Landeen
+* Irv Irra
