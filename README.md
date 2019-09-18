@@ -19,6 +19,8 @@ The fourth command, do-what-this-says, will take a file name as it's argument.  
 
 ![spotifysearch](https://github.com/rbaird2001/liri-node-app/blob/master/spotifySearch.gif)
 
+![filesearch](https://github.com/rbaird2001/liri-node-app/blob/master/fileSearch.gif)
+
 ## Requirements
 This project uses a NodeJS server which will need to be installed.  It depends on four node modules which need to be installed. The package.json file holds the details for the install. You should be able to install it from your terminal with the command _npm install_ if you in the same folder as this projects package.json file. The packages used are found inside the _Built With_ section of this documentation.
 
