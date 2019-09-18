@@ -10,7 +10,6 @@ var liriType = process.argv[2];
 var liriParam = process.argv.slice(3).join("+");
 
 
-
 //Add search method to Axios constructor 
 Axios.prototype.search = function (url) {
     this.url = url;
@@ -103,8 +102,8 @@ spotifySearch = function (str) {
             console.log(err);
         });
 }
-doRandomTxt = function () {
-    fs.readFile("random.txt", "utf-8", function (err, data) {
+doRandomTxt = function (liriParam) {
+    fs.readFile(liriParam, "utf-8", function (err, data) {
         if (err) {
             console.log(`error: ${err}`);
         }
@@ -134,7 +133,8 @@ searchEvent = function (liriType, liriParam) {
         return true
     }
     if (liriType === "do-what-this-says") {
-        doRandomTxt();
+        doRandomTxt(liriParam);
+        return true
     }
     else{
         console.log(`unknown command`);
