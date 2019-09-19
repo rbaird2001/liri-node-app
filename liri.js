@@ -13,8 +13,8 @@ var liriParam = process.argv.slice(3).join("+");
 //Add search method to Axios constructor 
 Axios.prototype.search = function (url) {
     this.url = url;
-    console.log("preAxios");
-    console.log(this.url);
+    //console.log("preAxios");
+    //console.log(this.url);
     return this.axios
         .get(this.url)
         .then(function (response) {
